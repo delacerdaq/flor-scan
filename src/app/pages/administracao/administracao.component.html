@@ -1,0 +1,127 @@
+<div class="admin-shell">
+    <div class="container">
+        <div class="admin-topline"><a routerLink="/dashboard">Visão
+                geral</a><span>/</span><strong>Administração</strong></div>
+        <section class="admin-header">
+            <div><span class="eyebrow">Painel de gerenciamento</span>
+                <h1>Gerenciar plantas</h1>
+                <p>Cadastre, edite e organize as espécies disponíveis no catálogo.</p>
+            </div>
+            <div class="admin-actions"><button type="button" class="btn btn-outline" (click)="restaurar()">Restaurar
+                    exemplos</button><button type="button" class="btn btn-primary" (click)="novo()">+ Nova
+                    planta</button></div>
+        </section>
+        <div class="alert success" *ngIf="mensagem" role="status">{{ mensagem }} <button type="button"
+                (click)="mensagem = ''" aria-label="Fechar mensagem">×</button></div>
+        <section *ngIf="formularioAberto" class="admin-panel admin-form-panel" id="formulario-planta">
+            <div class="panel-heading">
+                <div><span class="eyebrow">Catálogo de espécies</span>
+                    <h2>{{ editandoId !== null ? 'Editar planta' : 'Cadastrar nova planta' }}</h2>
+                </div><button type="button" class="close-button" (click)="cancelar()"
+                    aria-label="Fechar formulário">×</button>
+            </div>
+            <form #plantaForm="ngForm" (ngSubmit)="salvar()">
+                <div class="admin-form-grid">
+                    <div class="form-field"><label for="p-nome">Nome popular *</label><input id="p-nome" name="nome"
+                            [(ngModel)]="formulario.nome" required placeholder="Ex.: Orquídea"></div>
+                    <div class="form-field"><label for="p-cientifico">Nome científico *</label><input id="p-cientifico"
+                            name="cientifico" [(ngModel)]="formulario.nomeCientifico" required
+                            placeholder="Ex.: Phalaenopsis"></div>
+                    <div class="form-field"><label for="p-categoria">Categoria</label><select id="p-categoria"
+                            name="categoria" [(ngModel)]="formulario.categoria">
+                            <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
+                        </select></div>
+                    <div class="form-field"><label for="p-dificuldade">Dificuldade</label><select id="p-dificuldade"
+                            name="dificuldade" [(ngModel)]="formulario.dificuldade">
+                            <option>Fácil</option>
+                            <option>Moderada</option>
+                            <option>Avançada</option>
+                        </select></div>
+                    <div class="form-field full"><label for="p-descricao">Descrição *</label><textarea id="p-descricao"
+                            name="descricao" [(ngModel)]="formulario.descricao" rows="3" required
+                            placeholder="Descreva a espécie..."></textarea></div>
+                    <div class="form-field full"><label for="p-cuidados">Cuidados *</label><textarea id="p-cuidados"
+                            name="cuidados" [(ngModel)]="formulario.cuidados" rows="3" required
+                            placeholder="Dicas de cultivo e manutenção..."></textarea></div>
+                    <div class="form-field"><label for="p-luz">Luminosidade</label><input id="p-luz" name="luz"
+                            [(ngModel)]="formulario.luz" placeholder="Ex.: Luz indireta"></div>
+                    <div class="form-field"><label for="p-rega">Rega</label><input id="p-rega" name="rega"
+                            [(ngModel)]="formulario.rega" placeholder="Ex.: 2 vezes por semana"></div>
+                    <div class="form-field"><label for="p-temperatura">Temperatura</label><input id="p-temperatura"
+                            name="temperatura" [(ngModel)]="formulario.temperatura" placeholder="Ex.: 18–28 °C"></div>
+                    <div class="form-field"><label for="p-origem">Origem</label><input id="p-origem" name="origem"
+                            [(ngModel)]="formulario.origem" placeholder="Ex.: América do Sul"></div>
+                    <div class="form-field"><label for="p-imagem">Ilustração do catálogo</label><select id="p-imagem"
+                            name="imagem" [(ngModel)]="formulario.imagem">
+                            <option *ngFor="let imagem of ilustracoes; let i = index" [value]="imagem">Ilustração {{ i +
+                                1 }}</option>
+                        </select></div>
+                    <div class="form-field"><label for="p-tags">Etiquetas (separadas por vírgula)</label><input
+                            id="p-tags" name="tags" [(ngModel)]="tagsTexto" placeholder="Ex.: jardim, sombra, tropical">
+                    </div>
+                </div>
+                <label class="check-label"><input type="checkbox" name="destaque"
+                        [(ngModel)]="formulario.destaque"><span>Exibir na seção de destaques da página
+                        inicial</span></label>
+                <p class="form-error" *ngIf="erro" role="alert">{{ erro }}</p>
+                <div class="form-actions"><button class="btn btn-outline" type="button"
+                        (click)="cancelar()">Cancelar</button><button class="btn btn-primary" type="submit"
+                        [disabled]="plantaForm.invalid">{{ editandoId !== null ? 'Salvar alterações' : 'Cadastrar
+                        planta' }}</button></div>
+            </form>
+        </section>
+        <section class="admin-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Plantas cadastradas</h2>
+                    <p>{{ filtradas.length }} {{ filtradas.length === 1 ? 'registro' : 'registros' }} encontrado(s)</p>
+                </div>
+                <div class="table-search"><label class="visually-hidden" for="busca-admin">Pesquisar
+                        registros</label><input id="busca-admin" [(ngModel)]="textoBusca"
+                        placeholder="Pesquisar plantas..."></div>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Planta</th>
+                            <th>Categoria</th>
+                            <th>Dificuldade</th>
+                            <th>Destaque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of filtradas">
+                            <td>
+                                <div class="table-plant"><img [src]="item.imagem" alt="">
+                                    <div><strong>{{ item.nome }}</strong><span>{{ item.nomeCientifico }}</span></div>
+                                </div>
+                            </td>
+                            <td>{{ item.categoria }}</td>
+                            <td><span class="table-badge">{{ item.dificuldade }}</span></td>
+                            <td>{{ item.destaque ? 'Sim' : 'Não' }}</td>
+                            <td>
+                                <div class="row-actions"><a [routerLink]="['/plantas', item.id]"
+                                        title="Visualizar">Ver</a><button type="button"
+                                        (click)="editar(item)">Editar</button><button class="delete-action"
+                                        type="button" (click)="solicitarExclusao(item.id)">Excluir</button></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-table" *ngIf="!filtradas.length">Nenhum registro encontrado.</div>
+        </section>
+        <div class="delete-confirm" *ngIf="exclusaoPendente !== null" role="alertdialog"
+            aria-label="Confirmação de exclusão" aria-modal="true">
+            <div class="confirm-box">
+                <h2>Excluir esta planta?</h2>
+                <p>A exclusão remove o item da lista simulada. Você poderá restaurar os dados de exemplo depois.</p>
+                <div class="form-actions"><button class="btn btn-outline" type="button"
+                        (click)="exclusaoPendente = null">Cancelar</button><button class="btn btn-danger" type="button"
+                        (click)="confirmarExclusao()">Excluir planta</button></div>
+            </div>
+        </div>
+    </div>
+</div>

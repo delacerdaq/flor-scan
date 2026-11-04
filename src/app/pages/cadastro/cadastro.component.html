@@ -1,0 +1,38 @@
+<section class="auth-section register-section">
+    <div class="auth-visual"><a class="brand auth-brand" routerLink="/"><img src="assets/logo.svg" alt="" width="43"
+                height="43"><span>flor<span class="brand-accent">scan</span><small>.</small></span></a><img
+            class="auth-flower" src="assets/planta-rosa.svg" alt="Ilustração de uma flor rosa">
+        <div class="auth-visual-copy"><span class="eyebrow">Um novo começo</span>
+            <h2>Sua paixão por plantas <em>começa aqui.</em></h2>
+            <p>Crie uma conta demonstrativa para explorar, salvar e descobrir.</p>
+        </div>
+    </div>
+    <div class="auth-content">
+        <div class="auth-box"><span class="eyebrow">Faça parte do nosso jardim</span>
+            <h1>Crie sua conta</h1>
+            <p>Preencha os campos para começar a descobrir mais sobre plantas.</p>
+            <form #cadastroForm="ngForm" (ngSubmit)="cadastrar()">
+                <div class="form-field"><label for="registro-nome">Nome completo</label><input id="registro-nome"
+                        name="nome" type="text" required minlength="2" [(ngModel)]="nome"
+                        placeholder="Como podemos te chamar?" autocomplete="name"></div>
+                <div class="form-field"><label for="registro-email">E-mail</label><input id="registro-email"
+                        name="email" type="email" email required [(ngModel)]="email" placeholder="seuemail@exemplo.com"
+                        autocomplete="email"></div>
+                <div class="form-field"><label for="registro-senha">Senha</label><input id="registro-senha" name="senha"
+                        type="password" required minlength="6" [(ngModel)]="senha" placeholder="Pelo menos 6 caracteres"
+                        autocomplete="new-password"></div>
+                <div class="form-field"><label for="registro-confirmacao">Confirme sua senha</label><input
+                        id="registro-confirmacao" name="confirmarSenha" type="password" required
+                        [(ngModel)]="confirmarSenha" placeholder="Digite novamente a senha" autocomplete="new-password">
+                </div>
+                <label class="check-label"><input type="checkbox" name="aceito" [(ngModel)]="aceitoTermos"
+                        required><span>Compreendo que o FlorScan é um protótipo acadêmico e que o cadastro não utiliza
+                        um servidor seguro.</span></label>
+                <p class="form-error" *ngIf="erro" role="alert">{{ erro }}</p><button
+                    class="btn btn-primary btn-block btn-large" type="submit" [disabled]="cadastroForm.invalid">Criar
+                    minha conta <span aria-hidden="true">→</span></button>
+            </form>
+            <p class="auth-switch">Já tem uma conta? <a routerLink="/login">Fazer login</a></p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,41 @@
+<section class="page-banner catalog-banner">
+  <div class="container"><span class="eyebrow">Conheça nossa coleção</span>
+    <h1>Um jardim de <em>descobertas.</em></h1>
+    <p>Explore espécies, encontre suas favoritas e saiba tudo o que precisa para cuidar delas.</p>
+  </div><span class="banner-decoration" aria-hidden="true">✳</span>
+</section>
+<section class="section catalog-section">
+  <div class="container">
+    <div class="filter-panel">
+      <div class="filter-field search-field"><label for="busca-catalogo">Buscar uma planta</label>
+        <div class="input-with-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m16 16 5 5" />
+          </svg><input id="busca-catalogo" [(ngModel)]="busca" (ngModelChange)="filtrar()" name="busca"
+            placeholder="Nome, característica, espécie..."></div>
+      </div>
+      <div class="filter-field"><label for="filtro-categoria">Categoria</label><select id="filtro-categoria"
+          [(ngModel)]="categoria" (ngModelChange)="filtrar()" name="categoria">
+          <option value="Todas">Todas as categorias</option>
+          <option *ngFor="let opcao of categorias" [value]="opcao">{{ opcao }}</option>
+        </select></div>
+      <label class="filter-favorite"><input type="checkbox" [(ngModel)]="favoritas"
+          (ngModelChange)="filtrar()"><span>Somente favoritas</span></label>
+    </div>
+    <div class="catalog-count">
+      <div>
+        <h2>Explore as plantas</h2><span>{{ plantasFiltradas.length }} {{ plantasFiltradas.length === 1 ? 'espécie
+          encontrada' : 'espécies encontradas' }}</span>
+      </div><button class="link-button" (click)="limpar()" type="button">Limpar filtros</button>
+    </div>
+    <div class="plant-grid" *ngIf="plantasFiltradas.length > 0; else semResultados"><app-planta-card
+        *ngFor="let planta of plantasFiltradas" [planta]="planta"></app-planta-card></div>
+    <ng-template #semResultados>
+      <div class="empty-state"><img src="assets/planta-suculenta.svg" alt="" />
+        <h3>Nenhuma planta encontrada</h3>
+        <p>Tente outro nome, escolha uma categoria diferente ou limpe os filtros.</p><button type="button"
+          class="btn btn-primary" (click)="limpar()">Limpar filtros</button>
+      </div>
+    </ng-template>
+  </div>
+</section>

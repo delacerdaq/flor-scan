@@ -1,0 +1,26 @@
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+<header class="site-header">
+  <div class="container header-content">
+    <a class="brand" routerLink="/" (click)="fecharMenu()" aria-label="FlorScan - página inicial">
+      <img src="assets/logo.svg" alt="" width="39" height="39" />
+      <span>flor<span class="brand-accent">scan</span><small>.</small></span>
+    </a>
+    <button class="mobile-menu" type="button" [attr.aria-expanded]="menuAberto" aria-controls="menu-principal" (click)="menuAberto = !menuAberto" aria-label="Abrir ou fechar menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+    </button>
+    <nav id="menu-principal" class="nav-links" [class.open]="menuAberto" aria-label="Menu principal">
+      <a routerLink="/" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active" (click)="fecharMenu()">Início</a>
+      <a routerLink="/catalogo" routerLinkActive="active" (click)="fecharMenu()">Catálogo</a>
+      <a routerLink="/" fragment="identificar" (click)="fecharMenu()">Identificar planta</a>
+      <a *ngIf="auth.ehAdmin" routerLink="/dashboard" routerLinkActive="active" (click)="fecharMenu()">Dashboard</a>
+      <a *ngIf="auth.ehAdmin" routerLink="/administracao" routerLinkActive="active" (click)="fecharMenu()">Administração</a>
+      <div class="nav-auth" *ngIf="!auth.estaAutenticado; else usuarioLogado">
+        <a class="nav-login" routerLink="/login" (click)="fecharMenu()">Entrar</a>
+        <a class="btn btn-primary btn-small" routerLink="/cadastro" (click)="fecharMenu()">Criar conta</a>
+      </div>
+      <ng-template #usuarioLogado>
+        <div class="nav-auth"><span class="user-pill">Olá, {{ auth.usuarioAtual?.nome }}</span><button class="btn btn-outline btn-small" type="button" (click)="sair()">Sair</button></div>
+      </ng-template>
+    </nav>
+  </div>
+</header>

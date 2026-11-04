@@ -1,0 +1,52 @@
+<ng-container *ngIf="planta as item; else plantaAusente">
+  <div class="container breadcrumbs"><a routerLink="/">Início</a><span>›</span><a
+      routerLink="/catalogo">Catálogo</a><span>›</span><strong>{{ item.nome }}</strong></div>
+  <section class="section detail-section">
+    <div class="container detail-grid">
+      <div class="detail-image"><img [src]="item.imagem" [alt]="'Ilustração botânica de ' + item.nome"><span
+          class="plant-category detail-category">{{ item.categoria }}</span></div>
+      <div class="detail-content"><span class="eyebrow">Conheça esta espécie</span>
+        <h1>{{ item.nome }}</h1>
+        <p class="scientific-name">{{ item.nomeCientifico }}</p>
+        <div class="detail-labels"><span>✳ {{ item.dificuldade }} de cuidar</span><span>{{ item.categoria }}</span>
+        </div>
+        <p class="lead">{{ item.descricao }}</p>
+        <div class="care-grid">
+          <div><span class="care-icon">☼</span><small>ILUMINAÇÃO</small><strong>{{ item.luz }}</strong></div>
+          <div><span class="care-icon">◉</span><small>REGA</small><strong>{{ item.rega }}</strong></div>
+          <div><span class="care-icon">◌</span><small>TEMPERATURA</small><strong>{{ item.temperatura }}</strong></div>
+          <div><span class="care-icon">⌂</span><small>ORIGEM</small><strong>{{ item.origem }}</strong></div>
+        </div>
+        <div class="detail-actions"><button type="button" class="btn btn-primary" (click)="favoritar()">{{
+            plantas.ehFavorita(item.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}</button><a
+            routerLink="/catalogo" class="btn btn-outline">Voltar ao catálogo</a></div>
+      </div>
+    </div>
+  </section>
+  <section class="section care-section">
+    <div class="container care-panel">
+      <div><span class="eyebrow">Anote estas dicas</span>
+        <h2>Como cuidar da sua <em>{{ item.nome }}?</em></h2>
+        <p>{{ item.cuidados }}</p>
+      </div><img src="assets/leaf-accent.svg" alt="" aria-hidden="true">
+    </div>
+  </section>
+  <section class="section" *ngIf="relacionadas.length">
+    <div class="container">
+      <div class="section-top">
+        <div><span class="eyebrow">Continue explorando</span>
+          <h2>Você também pode gostar</h2>
+        </div>
+      </div>
+      <div class="plant-grid"><app-planta-card *ngFor="let relacionada of relacionadas"
+          [planta]="relacionada"></app-planta-card></div>
+    </div>
+  </section>
+</ng-container>
+<ng-template #plantaAusente>
+  <section class="container empty-state page-empty">
+    <h1>Planta não encontrada.</h1>
+    <p>O item foi removido ou o endereço está incorreto.</p><a routerLink="/catalogo" class="btn btn-primary">Ver
+      catálogo</a>
+  </section>
+</ng-template>

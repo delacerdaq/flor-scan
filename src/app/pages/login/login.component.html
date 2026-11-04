@@ -1,0 +1,35 @@
+<section class="auth-section">
+    <div class="auth-visual"><a class="brand auth-brand" routerLink="/"><img src="assets/logo.svg" alt="" width="43"
+                height="43"><span>flor<span class="brand-accent">scan</span><small>.</small></span></a><img
+            class="auth-flower" src="assets/hero-botanical.svg" alt="Ilustração de um vaso com flores">
+        <div class="auth-visual-copy"><span class="eyebrow">Cultive descobertas</span>
+            <h2>Mais natureza, <em>mais inspiração.</em></h2>
+            <p>Entre e continue explorando as espécies do nosso jardim digital.</p>
+        </div>
+    </div>
+    <div class="auth-content">
+        <div class="auth-box"><span class="eyebrow">Que bom te ver de novo</span>
+            <h1>Bem-vindo de volta!</h1>
+            <p>Entre na sua conta para continuar sua jornada pelo FlorScan.</p>
+            <form #loginForm="ngForm" (ngSubmit)="entrar()">
+                <div class="form-field"><label for="login-email">E-mail</label><input id="login-email" name="email"
+                        type="email" email required [(ngModel)]="email" placeholder="seuemail@exemplo.com"
+                        autocomplete="email"></div>
+                <div class="form-field"><label for="login-senha">Senha</label>
+                    <div class="password-wrapper"><input id="login-senha" name="senha"
+                            [type]="mostrarSenha ? 'text' : 'password'" required [(ngModel)]="senha"
+                            placeholder="Digite sua senha" autocomplete="current-password"><button type="button"
+                            class="show-password" (click)="mostrarSenha = !mostrarSenha">{{ mostrarSenha ? 'Ocultar' :
+                            'Mostrar' }}</button></div>
+                </div>
+                <p class="form-error" *ngIf="erro" role="alert">{{ erro }}</p><button
+                    class="btn btn-primary btn-block btn-large" type="submit" [disabled]="loginForm.invalid">Entrar na
+                    minha conta <span aria-hidden="true">→</span></button>
+            </form>
+            <div class="demo-account"><strong>Acesso administrativo para avaliação</strong><span>E-mail:
+                    admin&#64;florscan.com</span><span>Senha: FlorScan123</span><button type="button"
+                    class="link-button" (click)="usarDemo()">Preencher dados de demonstração</button></div>
+            <p class="auth-switch">Ainda não tem conta? <a routerLink="/cadastro">Cadastre-se gratuitamente</a></p>
+        </div>
+    </div>
+</section>

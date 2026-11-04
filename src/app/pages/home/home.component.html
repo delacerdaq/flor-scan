@@ -1,0 +1,144 @@
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="eyebrow-line"></span> Conheça o FlorScan</span>
+      <h1>Descubra a beleza que <em>floresce</em>.</h1>
+      <p>Um clique para descobrir. Uma nova espécie para amar.
+        Conheça as flores ao seu redor e deixe sua curiosidade florescer.</p>
+      <div class="hero-actions"><a routerLink="/catalogo" class="btn btn-primary btn-large">Explorar plantas <span
+            aria-hidden="true">↗</span></a><a routerLink="/" fragment="identificar"
+          class="btn btn-outline btn-large">Identificar uma planta</a></div>
+      <div class="hero-mini">
+        <div class="avatars"><span>F</span><span>L</span><span>S</span></div><span>Uma experiência feita para quem ama o
+          verde</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-shape"></div>
+      <img class="hero-illustration" src="assets/hero-botanical.svg"
+        alt="Ilustração botânica colorida com flores, folhas e um vaso" />
+      <div class="float-tag float-tag-top"><span class="float-icon">✿</span>
+        <div><b>Explore a natureza</b><small>De um jeito simples</small></div>
+      </div>
+      <div class="float-tag float-tag-bottom"><span class="circle-check">✓</span>
+        <div><b>Seu guia de plantas</b><small>Conhecimento ao alcance</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-wave" aria-hidden="true"></div>
+</section>
+
+<section class="quick-search-section">
+  <div class="container quick-search">
+    <div><span class="tiny-label">TEM UMA PLANTA EM MENTE?</span>
+      <h2>Vamos encontrá-la!</h2>
+    </div>
+    <form class="search-box" (ngSubmit)="pesquisar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m16 16 5 5" />
+      </svg><input name="busca" [(ngModel)]="busca" placeholder="Pesquise por nome, espécie ou característica"
+        aria-label="Buscar plantas"><button type="submit" class="btn btn-primary">Buscar</button></form>
+  </div>
+</section>
+
+<section class="section category-section">
+  <div class="container">
+    <div class="section-top">
+      <div><span class="eyebrow">Um mundo para descobrir</span>
+        <h2>Encontre sua próxima <span class="highlight-olive">paixão verde.</span></h2>
+      </div>
+      <p>Do jardim à janela: descubra diferentes tipos de plantas e aprenda o que torna cada uma especial.</p>
+    </div>
+    <div class="category-grid">
+      <a routerLink="/catalogo" [queryParams]="{categoria: 'Flores'}" class="category-tile category-flower">
+        <div class="category-art"><img src="assets/planta-rosa.svg" alt="" loading="lazy"></div>
+        <div>
+          <h3>Flores</h3>
+          <p>Cores que encantam</p>
+        </div><span class="cat-arrow">↗</span>
+      </a>
+      <a routerLink="/catalogo" [queryParams]="{categoria: 'Folhagens'}" class="category-tile category-leaves">
+        <div class="category-art"><img src="assets/planta-monstera.svg" alt="" loading="lazy"></div>
+        <div>
+          <h3>Folhagens</h3>
+          <p>Verde em todo canto</p>
+        </div><span class="cat-arrow">↗</span>
+      </a>
+      <a routerLink="/catalogo" [queryParams]="{categoria: 'Suculentas'}" class="category-tile category-succulents">
+        <div class="category-art"><img src="assets/planta-suculenta.svg" alt="" loading="lazy"></div>
+        <div>
+          <h3>Suculentas</h3>
+          <p>Pequenas maravilhas</p>
+        </div><span class="cat-arrow">↗</span>
+      </a>
+      <a routerLink="/catalogo" [queryParams]="{categoria: 'Ervas'}" class="category-tile category-herbs">
+        <div class="category-art"><img src="assets/planta-lavanda.svg" alt="" loading="lazy"></div>
+        <div>
+          <h3>Ervas</h3>
+          <p>Aromas e cuidados</p>
+        </div><span class="cat-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section featured-section">
+  <div class="container">
+    <div class="section-heading-center"><span class="eyebrow">Escolhidas para você</span>
+      <h2>Plantas que merecem <em>destaque.</em></h2>
+      <p>Conheça algumas das nossas espécies favoritas e descubra os cuidados de cada uma.</p>
+    </div>
+    <div class="plant-grid"><app-planta-card *ngFor="let planta of destaques" [planta]="planta"></app-planta-card></div>
+    <div class="section-action"><a class="btn btn-outline" routerLink="/catalogo">Ver catálogo completo <span
+          aria-hidden="true">→</span></a></div>
+  </div>
+</section>
+
+<section id="identificar" class="identification-section">
+  <div class="container identify-layout">
+    <div class="identify-content"><span class="eyebrow">Descubra mais</span>
+      <h2>Encontrou uma planta e quer <em>saber o nome?</em></h2>
+      <p>Envie uma foto para visualizar uma prévia e experimentar o fluxo de identificação do FlorScan.</p>
+      <ul class="check-list">
+        <li>Envie uma imagem da sua galeria</li>
+        <li>Confira a prévia antes de continuar</li>
+        <li>Abra o guia da espécie sugerida</li>
+      </ul>
+      <p class="mock-warning">Versão acadêmica: a sugestão é simulada, não uma análise real da imagem.</p>
+    </div>
+    <div class="upload-panel">
+      <div class="upload-panel-title"><span class="upload-mini-icon">✳</span>
+        <div>
+          <h3>Identificar minha planta</h3>
+          <p>Seu primeiro passo para conhecer mais</p>
+        </div>
+      </div>
+      <label class="drop-zone" for="arquivo-planta" [class.with-preview]="previaImagem"><ng-container
+          *ngIf="!previaImagem; else previewFoto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5">
+            <path d="M4 6h4l2-2h4l2 2h4v14H4z" />
+            <circle cx="12" cy="13" r="3" />
+          </svg><strong>Clique para escolher uma foto</strong><span>PNG, JPG ou WEBP de até 5
+            MB</span></ng-container><ng-template #previewFoto><img [src]="previaImagem!"
+            alt="Prévia da imagem selecionada"><span>{{ arquivoNome }}</span></ng-template></label>
+      <input id="arquivo-planta" class="visually-hidden" type="file" accept="image/*" (change)="selecionarFoto($event)">
+      <p class="form-error" *ngIf="erroArquivo" role="alert">{{ erroArquivo }}</p>
+      <button class="btn btn-primary btn-block" type="button" [disabled]="!previaImagem" (click)="identificar()">Ver
+        sugestão demonstrativa <span aria-hidden="true">→</span></button>
+      <div class="suggestion" *ngIf="sugestao"><img [src]="sugestao.imagem" [alt]="'Ilustração de ' + sugestao.nome">
+        <div><span>EXEMPLO DE RESULTADO</span><strong>{{ sugestao.nome }}</strong><a
+            [routerLink]="['/plantas', sugestao.id]">Conhecer esta planta →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container cta-inner">
+    <div><span class="eyebrow">A natureza está te esperando</span>
+      <h2>Seu próximo <em>descobrimento</em> começa aqui.</h2>
+    </div><a class="btn btn-dark btn-large" routerLink="/catalogo">Explorar o FlorScan <span
+        aria-hidden="true">↗</span></a>
+  </div>
+</section>

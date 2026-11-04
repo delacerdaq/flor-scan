@@ -1,0 +1,66 @@
+<section class="admin-shell">
+    <div class="container">
+        <div class="admin-topline"><strong>Painel</strong><span>/</span>Visão geral</div>
+        <div class="admin-header">
+            <div><span class="eyebrow">Bem-vindo ao FlorScan</span>
+                <h1>Visão geral</h1>
+                <p>Acompanhe as informações do catálogo e mantenha tudo organizado.</p>
+            </div><a class="btn btn-primary" routerLink="/administracao">Gerenciar catálogo <span
+                    aria-hidden="true">→</span></a>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-icon green">✳</span>
+                <p>Total de espécies</p><strong>{{ plantas.length }}</strong><small>Plantas cadastradas</small>
+            </div>
+            <div class="stat-card"><span class="stat-icon pink">✿</span>
+                <p>Em destaque</p><strong>{{ totalDestaques }}</strong><small>Na página inicial</small>
+            </div>
+            <div class="stat-card"><span class="stat-icon yellow">⌑</span>
+                <p>Categorias</p><strong>{{ categorias.length }}</strong><small>Tipos de plantas</small>
+            </div>
+            <div class="stat-card"><span class="stat-icon lavender">♡</span>
+                <p>Favoritos nesta sessão</p><strong>{{ service.quantidadeFavoritas() }}</strong><small>Salvos
+                    temporariamente</small>
+            </div>
+        </div>
+        <div class="dashboard-grid">
+            <section class="admin-panel">
+                <div class="panel-heading">
+                    <div><span class="eyebrow">Distribuição</span>
+                        <h2>Plantas por categoria</h2>
+                    </div>
+                </div>
+                <div class="category-bars">
+                    <div *ngFor="let categoria of categorias" class="bar-item">
+                        <div class="bar-label"><strong>{{ categoria.nome }}</strong><span>{{ categoria.quantidade }} ({{
+                                categoria.percentual }}%)</span></div>
+                        <div class="bar-track">
+                            <div class="bar-fill" [style.width.%]="categoria.percentual"></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="panel-hint">Dados calculados dinamicamente a partir do PlantaService.</p>
+            </section>
+            <section class="admin-panel dashboard-tips"><span class="eyebrow">Seu espaço de trabalho</span>
+                <h2>Um catálogo sempre florescendo.</h2>
+                <p>Use o painel de administração para adicionar novas espécies, revisar informações e deixar as
+                    descobertas em destaque.</p><img src="assets/planta-suculenta.svg"
+                    alt="Ilustração de uma suculenta" /><a class="text-link" routerLink="/administracao">Administrar
+                    espécies →</a>
+            </section>
+        </div>
+        <section class="admin-panel recent-panel">
+            <div class="panel-heading">
+                <div><span class="eyebrow">Atualizações recentes</span>
+                    <h2>Últimas espécies cadastradas</h2>
+                </div><a routerLink="/administracao" class="text-link">Ver todas →</a>
+            </div>
+            <div class="recent-list"><a *ngFor="let planta of recentes" [routerLink]="['/plantas', planta.id]"
+                    class="recent-item"><img [src]="planta.imagem" alt="">
+                    <div><strong>{{ planta.nome }}</strong><span>{{ planta.categoria }} · {{ planta.nomeCientifico
+                            }}</span></div><span class="recent-date">{{ planta.criadoEm | date:'dd/MM/yyyy'
+                        }}</span><span class="recent-arrow">→</span>
+                </a></div>
+        </section>
+    </div>
+</section>

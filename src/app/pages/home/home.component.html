@@ -101,13 +101,13 @@
   <div class="container identify-layout">
     <div class="identify-content"><span class="eyebrow">Descubra mais</span>
       <h2>Encontrou uma planta e quer <em>saber o nome?</em></h2>
-      <p>Envie uma foto para visualizar uma prévia e experimentar o fluxo de identificação do FlorScan.</p>
+      <p>Envie uma foto para identificar a espécie com o Pl@ntNet, um serviço especializado em reconhecimento botânico por imagem.</p>
       <ul class="check-list">
-        <li>Envie uma imagem da sua galeria</li>
-        <li>Confira a prévia antes de continuar</li>
-        <li>Abra o guia da espécie sugerida</li>
+        <li>Envie uma foto nítida da folha, flor, fruto ou casca</li>
+        <li>Confira a prévia antes de enviar</li>
+        <li>Veja as espécies sugeridas e abra o guia, se já estiver no catálogo</li>
       </ul>
-      <p class="mock-warning">Versão acadêmica: a sugestão é simulada, não uma análise real da imagem.</p>
+      <p class="mock-warning">Sua foto é enviada a um serviço externo (Pl@ntNet) apenas para a identificação e não é armazenada pelo FlorScan. Os resultados são sugestões automáticas e podem exigir confirmação humana.</p>
     </div>
     <div class="upload-panel">
       <div class="upload-panel-title"><span class="upload-mini-icon">✳</span>
@@ -121,16 +121,44 @@
             stroke-width="1.5">
             <path d="M4 6h4l2-2h4l2 2h4v14H4z" />
             <circle cx="12" cy="13" r="3" />
-          </svg><strong>Clique para escolher uma foto</strong><span>PNG, JPG ou WEBP de até 5
+          </svg><strong>Clique para escolher uma foto</strong><span>JPEG ou PNG de até 10
             MB</span></ng-container><ng-template #previewFoto><img [src]="previaImagem!"
-            alt="Prévia da imagem selecionada"><span>{{ arquivoNome }}</span></ng-template></label>
-      <input id="arquivo-planta" class="visually-hidden" type="file" accept="image/*" (change)="selecionarFoto($event)">
+            alt="Prévia da imagem selecionada"><span>{{ arquivoSelecionado?.name }}</span></ng-template></label>
+      <input id="arquivo-planta" class="visually-hidden" type="file" accept="image/jpeg,image/png" (change)="selecionarFoto($event)">
       <p class="form-error" *ngIf="erroArquivo" role="alert">{{ erroArquivo }}</p>
-      <button class="btn btn-primary btn-block" type="button" [disabled]="!previaImagem" (click)="identificar()">Ver
-        sugestão demonstrativa <span aria-hidden="true">→</span></button>
-      <div class="suggestion" *ngIf="sugestao"><img [src]="sugestao.imagem" [alt]="'Ilustração de ' + sugestao.nome">
-        <div><span>EXEMPLO DE RESULTADO</span><strong>{{ sugestao.nome }}</strong><a
-            [routerLink]="['/plantas', sugestao.id]">Conhecer esta planta →</a></div>
+
+      <div class="form-field" *ngIf="previaImagem">
+        <label for="orgao-planta">Parte da planta na foto</label>
+        <select id="orgao-planta" name="organo" [(ngModel)]="organoSelecionado" [disabled]="identificando">
+          <option *ngFor="let opcao of orgaos" [value]="opcao.valor">{{ opcao.rotulo }}</option>
+        </select>
+      </div>
+
+      <div class="form-actions" *ngIf="previaImagem">
+        <button class="btn btn-outline" type="button" [disabled]="identificando" (click)="removerFoto()">Remover foto</button>
+        <button class="btn btn-primary" type="button" [disabled]="identificando" (click)="identificar()">{{
+          identificando ? 'Identificando...' : 'Identificar planta' }} <span aria-hidden="true">→</span></button>
+      </div>
+
+      <p class="form-error" *ngIf="erroIdentificacao" role="alert">{{ erroIdentificacao }} <button type="button"
+          class="link-button" (click)="identificar()">Tentar novamente</button></p>
+
+      <div class="empty-state" *ngIf="identificacaoInconclusiva" role="status">
+        <h3>Não foi possível identificar essa planta</h3>
+        <p>Tente outra foto, mostrando claramente a folha, a flor ou o fruto.</p>
+      </div>
+
+      <div class="suggestion" *ngFor="let resultado of resultados">
+        <img *ngIf="resultado.plantaCorrespondente" [src]="resultado.plantaCorrespondente.imagem"
+          [alt]="'Ilustração de ' + resultado.plantaCorrespondente.nome">
+        <div><span>{{ resultado.pontuacao * 100 | number:'1.0-1' }}% de confiança</span>
+          <strong>{{ resultado.nomeCientifico }}</strong>
+          <span *ngIf="resultado.nomesPopulares.length">{{ resultado.nomesPopulares.join(', ') }}</span>
+          <span *ngIf="resultado.familia">Família: {{ resultado.familia }}</span>
+          <a *ngIf="resultado.plantaCorrespondente" [routerLink]="['/plantas', resultado.plantaCorrespondente.id]">Conhecer
+            esta planta no catálogo →</a>
+          <span *ngIf="!resultado.plantaCorrespondente">Esta espécie ainda não está cadastrada no catálogo do FlorScan.</span>
+        </div>
       </div>
     </div>
   </div>

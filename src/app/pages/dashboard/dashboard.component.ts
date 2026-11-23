@@ -10,6 +10,8 @@ export class DashboardComponent implements OnInit {
   categorias: { nome: CategoriaPlanta; quantidade: number; percentual: number }[] = [];
   recentes: Planta[] = [];
   totalDestaques = 0;
+  carregando = true;
+  erro = '';
   constructor(public readonly service: PlantaService) {}
   ngOnInit(): void {
     this.service.plantas$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(plantas => {
@@ -21,5 +23,7 @@ export class DashboardComponent implements OnInit {
         return { nome, quantidade, percentual: plantas.length ? Math.round(100 * quantidade / plantas.length) : 0 };
       });
     });
+    this.service.carregando$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(carregando => this.carregando = carregando);
+    this.service.erro$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(erro => this.erro = erro ?? '');
   }
 }

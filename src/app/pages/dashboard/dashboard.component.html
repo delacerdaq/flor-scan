@@ -8,7 +8,9 @@
             </div><a class="btn btn-primary" routerLink="/administracao">Gerenciar catálogo <span
                     aria-hidden="true">→</span></a>
         </div>
-        <div class="stats-grid">
+        <div class="alert error" *ngIf="erro" role="alert">{{ erro }} <button type="button" (click)="service.recarregar()">Tentar novamente</button></div>
+        <p *ngIf="carregando">Carregando indicadores...</p>
+        <div class="stats-grid" *ngIf="!carregando">
             <div class="stat-card"><span class="stat-icon green">✳</span>
                 <p>Total de espécies</p><strong>{{ plantas.length }}</strong><small>Plantas cadastradas</small>
             </div>

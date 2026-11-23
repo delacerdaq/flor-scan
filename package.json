@@ -10,7 +10,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI",
-    "api": "json-server --watch db.json --port 3000"
+    "api": "json-server --watch db.json --port 3000",
+    "api:identificacao": "node server/identificacao-api.js"
   },
   "dependencies": {
     "@angular/animations": "^20.3.0",

@@ -11,26 +11,42 @@
         <div class="auth-box"><span class="eyebrow">Faça parte do nosso jardim</span>
             <h1>Crie sua conta</h1>
             <p>Preencha os campos para começar a descobrir mais sobre plantas.</p>
-            <form #cadastroForm="ngForm" (ngSubmit)="cadastrar()">
+            <form [formGroup]="formulario" (ngSubmit)="cadastrar()">
                 <div class="form-field"><label for="registro-nome">Nome completo</label><input id="registro-nome"
-                        name="nome" type="text" required minlength="2" [(ngModel)]="nome"
-                        placeholder="Como podemos te chamar?" autocomplete="name"></div>
-                <div class="form-field"><label for="registro-email">E-mail</label><input id="registro-email"
-                        name="email" type="email" email required [(ngModel)]="email" placeholder="seuemail@exemplo.com"
-                        autocomplete="email"></div>
-                <div class="form-field"><label for="registro-senha">Senha</label><input id="registro-senha" name="senha"
-                        type="password" required minlength="6" [(ngModel)]="senha" placeholder="Pelo menos 6 caracteres"
-                        autocomplete="new-password"></div>
-                <div class="form-field"><label for="registro-confirmacao">Confirme sua senha</label><input
-                        id="registro-confirmacao" name="confirmarSenha" type="password" required
-                        [(ngModel)]="confirmarSenha" placeholder="Digite novamente a senha" autocomplete="new-password">
+                        formControlName="nome" type="text" placeholder="Como podemos te chamar?" autocomplete="name">
+                    <p class="form-error" *ngIf="nome.invalid && (nome.touched || tentouEnviar)" role="alert">
+                        <ng-container *ngIf="nome.errors?.['required']">Informe seu nome.</ng-container>
+                        <ng-container *ngIf="nome.errors?.['minlength']">O nome deve ter ao menos 2 caracteres.</ng-container>
+                    </p>
                 </div>
-                <label class="check-label"><input type="checkbox" name="aceito" [(ngModel)]="aceitoTermos"
-                        required><span>Compreendo que o FlorScan é um protótipo acadêmico e que o cadastro não utiliza
+                <div class="form-field"><label for="registro-email">E-mail</label><input id="registro-email"
+                        formControlName="email" type="email" placeholder="seuemail@exemplo.com" autocomplete="email">
+                    <p class="form-error" *ngIf="email.invalid && (email.touched || tentouEnviar)" role="alert">
+                        <ng-container *ngIf="email.errors?.['required']">Informe seu e-mail.</ng-container>
+                        <ng-container *ngIf="email.errors?.['email']">Informe um e-mail válido.</ng-container>
+                    </p>
+                </div>
+                <div class="form-field"><label for="registro-senha">Senha</label><input id="registro-senha"
+                        formControlName="senha" type="password" placeholder="Pelo menos 6 caracteres"
+                        autocomplete="new-password">
+                    <p class="form-error" *ngIf="senha.invalid && (senha.touched || tentouEnviar)" role="alert">
+                        <ng-container *ngIf="senha.errors?.['required']">Informe uma senha.</ng-container>
+                        <ng-container *ngIf="senha.errors?.['minlength']">A senha deve ter ao menos 6 caracteres.</ng-container>
+                    </p>
+                </div>
+                <div class="form-field"><label for="registro-confirmacao">Confirme sua senha</label><input
+                        id="registro-confirmacao" formControlName="confirmarSenha" type="password"
+                        placeholder="Digite novamente a senha" autocomplete="new-password">
+                    <p class="form-error" *ngIf="(confirmarSenha.touched || tentouEnviar) && (confirmarSenha.errors?.['required'] || formulario.errors?.['senhasDiferentes'])" role="alert">
+                        <ng-container *ngIf="confirmarSenha.errors?.['required']">Confirme sua senha.</ng-container>
+                        <ng-container *ngIf="!confirmarSenha.errors?.['required'] && formulario.errors?.['senhasDiferentes']">As senhas informadas não coincidem.</ng-container>
+                    </p>
+                </div>
+                <label class="check-label"><input type="checkbox" formControlName="aceitoTermos"><span>Compreendo que o FlorScan é um protótipo acadêmico e que o cadastro não utiliza
                         um servidor seguro.</span></label>
+                <p class="form-error" *ngIf="aceitoTermos.invalid && (aceitoTermos.touched || tentouEnviar)" role="alert">Confirme que compreende o caráter demonstrativo da aplicação.</p>
                 <p class="form-error" *ngIf="erro" role="alert">{{ erro }}</p><button
-                    class="btn btn-primary btn-block btn-large" type="submit" [disabled]="cadastroForm.invalid">Criar
-                    minha conta <span aria-hidden="true">→</span></button>
+                    class="btn btn-primary btn-block btn-large" type="submit" [disabled]="formulario.invalid || enviando">{{ enviando ? 'Criando conta...' : 'Criar minha conta' }} <span aria-hidden="true">→</span></button>
             </form>
             <p class="auth-switch">Já tem uma conta? <a routerLink="/login">Fazer login</a></p>
         </div>

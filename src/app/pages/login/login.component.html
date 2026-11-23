@@ -11,20 +11,25 @@
         <div class="auth-box"><span class="eyebrow">Que bom te ver de novo</span>
             <h1>Bem-vindo de volta!</h1>
             <p>Entre na sua conta para continuar sua jornada pelo FlorScan.</p>
-            <form #loginForm="ngForm" (ngSubmit)="entrar()">
-                <div class="form-field"><label for="login-email">E-mail</label><input id="login-email" name="email"
-                        type="email" email required [(ngModel)]="email" placeholder="seuemail@exemplo.com"
-                        autocomplete="email"></div>
+            <form [formGroup]="formulario" (ngSubmit)="entrar()">
+                <div class="form-field"><label for="login-email">E-mail</label><input id="login-email"
+                        formControlName="email" type="email" placeholder="seuemail@exemplo.com"
+                        autocomplete="email">
+                    <p class="form-error" *ngIf="email.invalid && (email.touched || tentouEnviar)" role="alert">
+                        <ng-container *ngIf="email.errors?.['required']">Informe seu e-mail.</ng-container>
+                        <ng-container *ngIf="email.errors?.['email']">Informe um e-mail válido.</ng-container>
+                    </p>
+                </div>
                 <div class="form-field"><label for="login-senha">Senha</label>
-                    <div class="password-wrapper"><input id="login-senha" name="senha"
-                            [type]="mostrarSenha ? 'text' : 'password'" required [(ngModel)]="senha"
-                            placeholder="Digite sua senha" autocomplete="current-password"><button type="button"
+                    <div class="password-wrapper"><input id="login-senha" formControlName="senha"
+                            [type]="mostrarSenha ? 'text' : 'password'" placeholder="Digite sua senha"
+                            autocomplete="current-password"><button type="button"
                             class="show-password" (click)="mostrarSenha = !mostrarSenha">{{ mostrarSenha ? 'Ocultar' :
                             'Mostrar' }}</button></div>
+                    <p class="form-error" *ngIf="senha.invalid && (senha.touched || tentouEnviar)" role="alert">Informe sua senha.</p>
                 </div>
                 <p class="form-error" *ngIf="erro" role="alert">{{ erro }}</p><button
-                    class="btn btn-primary btn-block btn-large" type="submit" [disabled]="loginForm.invalid">Entrar na
-                    minha conta <span aria-hidden="true">→</span></button>
+                    class="btn btn-primary btn-block btn-large" type="submit" [disabled]="formulario.invalid || enviando">{{ enviando ? 'Entrando...' : 'Entrar na minha conta' }} <span aria-hidden="true">→</span></button>
             </form>
             <div class="demo-account"><strong>Acesso administrativo para avaliação</strong><span>E-mail:
                     admin&#64;florscan.com</span><span>Senha: FlorScan123</span><button type="button"

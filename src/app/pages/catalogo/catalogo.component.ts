@@ -11,6 +11,8 @@ export class CatalogoComponent implements OnInit {
   categoria: CategoriaPlanta | 'Todas' = 'Todas';
   favoritas = false;
   plantasFiltradas: Planta[] = [];
+  carregando = true;
+  erro = '';
   readonly categorias = this.plantas.categorias;
 
   constructor(public readonly plantas: PlantaService, private readonly rota: ActivatedRoute) {}
@@ -24,6 +26,8 @@ export class CatalogoComponent implements OnInit {
     });
     this.plantas.plantas$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.filtrar());
     this.plantas.favoritos$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.filtrar());
+    this.plantas.carregando$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(carregando => this.carregando = carregando);
+    this.plantas.erro$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(erro => this.erro = erro ?? '');
   }
 
   filtrar(): void {

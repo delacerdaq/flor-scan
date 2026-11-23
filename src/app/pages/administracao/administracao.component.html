@@ -7,12 +7,13 @@
                 <h1>Gerenciar plantas</h1>
                 <p>Cadastre, edite e organize as espécies disponíveis no catálogo.</p>
             </div>
-            <div class="admin-actions"><button type="button" class="btn btn-outline" (click)="restaurar()">Restaurar
+            <div class="admin-actions"><button type="button" class="btn btn-outline" [disabled]="salvando" (click)="restaurar()">Restaurar
                     exemplos</button><button type="button" class="btn btn-primary" (click)="novo()">+ Nova
                     planta</button></div>
         </section>
         <div class="alert success" *ngIf="mensagem" role="status">{{ mensagem }} <button type="button"
                 (click)="mensagem = ''" aria-label="Fechar mensagem">×</button></div>
+        <div class="alert error" *ngIf="erroLista" role="alert">{{ erroLista }} <button type="button" (click)="plantas.recarregar()">Tentar novamente</button></div>
         <section *ngIf="formularioAberto" class="admin-panel admin-form-panel" id="formulario-planta">
             <div class="panel-heading">
                 <div><span class="eyebrow">Catálogo de espécies</span>
@@ -20,67 +21,71 @@
                 </div><button type="button" class="close-button" (click)="cancelar()"
                     aria-label="Fechar formulário">×</button>
             </div>
-            <form #plantaForm="ngForm" (ngSubmit)="salvar()">
+            <form [formGroup]="formulario" (ngSubmit)="salvar()">
                 <div class="admin-form-grid">
-                    <div class="form-field"><label for="p-nome">Nome popular *</label><input id="p-nome" name="nome"
-                            [(ngModel)]="formulario.nome" required placeholder="Ex.: Orquídea"></div>
+                    <div class="form-field"><label for="p-nome">Nome popular *</label><input id="p-nome"
+                            formControlName="nome" placeholder="Ex.: Orquídea">
+                        <p class="form-error" *ngIf="nome.invalid && (nome.touched || tentouEnviar)" role="alert">Informe o nome popular.</p>
+                    </div>
                     <div class="form-field"><label for="p-cientifico">Nome científico *</label><input id="p-cientifico"
-                            name="cientifico" [(ngModel)]="formulario.nomeCientifico" required
-                            placeholder="Ex.: Phalaenopsis"></div>
+                            formControlName="nomeCientifico" placeholder="Ex.: Phalaenopsis">
+                        <p class="form-error" *ngIf="nomeCientifico.invalid && (nomeCientifico.touched || tentouEnviar)" role="alert">Informe o nome científico.</p>
+                    </div>
                     <div class="form-field"><label for="p-categoria">Categoria</label><select id="p-categoria"
-                            name="categoria" [(ngModel)]="formulario.categoria">
+                            formControlName="categoria">
                             <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
                         </select></div>
                     <div class="form-field"><label for="p-dificuldade">Dificuldade</label><select id="p-dificuldade"
-                            name="dificuldade" [(ngModel)]="formulario.dificuldade">
+                            formControlName="dificuldade">
                             <option>Fácil</option>
                             <option>Moderada</option>
                             <option>Avançada</option>
                         </select></div>
                     <div class="form-field full"><label for="p-descricao">Descrição *</label><textarea id="p-descricao"
-                            name="descricao" [(ngModel)]="formulario.descricao" rows="3" required
-                            placeholder="Descreva a espécie..."></textarea></div>
+                            formControlName="descricao" rows="3" placeholder="Descreva a espécie..."></textarea>
+                        <p class="form-error" *ngIf="descricao.invalid && (descricao.touched || tentouEnviar)" role="alert">Informe a descrição.</p>
+                    </div>
                     <div class="form-field full"><label for="p-cuidados">Cuidados *</label><textarea id="p-cuidados"
-                            name="cuidados" [(ngModel)]="formulario.cuidados" rows="3" required
-                            placeholder="Dicas de cultivo e manutenção..."></textarea></div>
-                    <div class="form-field"><label for="p-luz">Luminosidade</label><input id="p-luz" name="luz"
-                            [(ngModel)]="formulario.luz" placeholder="Ex.: Luz indireta"></div>
-                    <div class="form-field"><label for="p-rega">Rega</label><input id="p-rega" name="rega"
-                            [(ngModel)]="formulario.rega" placeholder="Ex.: 2 vezes por semana"></div>
+                            formControlName="cuidados" rows="3" placeholder="Dicas de cultivo e manutenção..."></textarea>
+                        <p class="form-error" *ngIf="cuidados.invalid && (cuidados.touched || tentouEnviar)" role="alert">Informe os cuidados.</p>
+                    </div>
+                    <div class="form-field"><label for="p-luz">Luminosidade</label><input id="p-luz"
+                            formControlName="luz" placeholder="Ex.: Luz indireta"></div>
+                    <div class="form-field"><label for="p-rega">Rega</label><input id="p-rega"
+                            formControlName="rega" placeholder="Ex.: 2 vezes por semana"></div>
                     <div class="form-field"><label for="p-temperatura">Temperatura</label><input id="p-temperatura"
-                            name="temperatura" [(ngModel)]="formulario.temperatura" placeholder="Ex.: 18–28 °C"></div>
-                    <div class="form-field"><label for="p-origem">Origem</label><input id="p-origem" name="origem"
-                            [(ngModel)]="formulario.origem" placeholder="Ex.: América do Sul"></div>
+                            formControlName="temperatura" placeholder="Ex.: 18–28 °C"></div>
+                    <div class="form-field"><label for="p-origem">Origem</label><input id="p-origem"
+                            formControlName="origem" placeholder="Ex.: América do Sul"></div>
                     <div class="form-field"><label for="p-imagem">Ilustração do catálogo</label><select id="p-imagem"
-                            name="imagem" [(ngModel)]="formulario.imagem">
+                            formControlName="imagem">
                             <option *ngFor="let imagem of ilustracoes; let i = index" [value]="imagem">Ilustração {{ i +
                                 1 }}</option>
                         </select></div>
                     <div class="form-field"><label for="p-tags">Etiquetas (separadas por vírgula)</label><input
-                            id="p-tags" name="tags" [(ngModel)]="tagsTexto" placeholder="Ex.: jardim, sombra, tropical">
+                            id="p-tags" formControlName="tagsTexto" placeholder="Ex.: jardim, sombra, tropical">
                     </div>
                 </div>
-                <label class="check-label"><input type="checkbox" name="destaque"
-                        [(ngModel)]="formulario.destaque"><span>Exibir na seção de destaques da página
+                <label class="check-label"><input type="checkbox" formControlName="destaque"><span>Exibir na seção de destaques da página
                         inicial</span></label>
                 <p class="form-error" *ngIf="erro" role="alert">{{ erro }}</p>
                 <div class="form-actions"><button class="btn btn-outline" type="button"
                         (click)="cancelar()">Cancelar</button><button class="btn btn-primary" type="submit"
-                        [disabled]="plantaForm.invalid">{{ editandoId !== null ? 'Salvar alterações' : 'Cadastrar
-                        planta' }}</button></div>
+                        [disabled]="formulario.invalid || salvando">{{ salvando ? 'Salvando...' : (editandoId !== null ? 'Salvar alterações' : 'Cadastrar planta') }}</button></div>
             </form>
         </section>
         <section class="admin-panel">
             <div class="panel-heading">
                 <div>
                     <h2>Plantas cadastradas</h2>
-                    <p>{{ filtradas.length }} {{ filtradas.length === 1 ? 'registro' : 'registros' }} encontrado(s)</p>
+                    <p *ngIf="!carregandoLista">{{ filtradas.length }} {{ filtradas.length === 1 ? 'registro' : 'registros' }} encontrado(s)</p>
+                    <p *ngIf="carregandoLista">Carregando plantas...</p>
                 </div>
                 <div class="table-search"><label class="visually-hidden" for="busca-admin">Pesquisar
                         registros</label><input id="busca-admin" [(ngModel)]="textoBusca"
                         placeholder="Pesquisar plantas..."></div>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive" *ngIf="!carregandoLista">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -111,16 +116,16 @@
                     </tbody>
                 </table>
             </div>
-            <div class="empty-table" *ngIf="!filtradas.length">Nenhum registro encontrado.</div>
+            <div class="empty-table" *ngIf="!carregandoLista && !filtradas.length">Nenhum registro encontrado.</div>
         </section>
         <div class="delete-confirm" *ngIf="exclusaoPendente !== null" role="alertdialog"
             aria-label="Confirmação de exclusão" aria-modal="true">
             <div class="confirm-box">
                 <h2>Excluir esta planta?</h2>
-                <p>A exclusão remove o item da lista simulada. Você poderá restaurar os dados de exemplo depois.</p>
+                <p>A exclusão remove o item permanentemente da API. Você poderá restaurar os dados de exemplo depois.</p>
                 <div class="form-actions"><button class="btn btn-outline" type="button"
-                        (click)="exclusaoPendente = null">Cancelar</button><button class="btn btn-danger" type="button"
-                        (click)="confirmarExclusao()">Excluir planta</button></div>
+                        (click)="exclusaoPendente = null">Cancelar</button><button class="btn btn-danger" type="button" [disabled]="salvando"
+                        (click)="confirmarExclusao()">{{ salvando ? 'Excluindo...' : 'Excluir planta' }}</button></div>
             </div>
         </div>
     </div>

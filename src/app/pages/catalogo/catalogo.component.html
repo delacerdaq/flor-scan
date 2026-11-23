@@ -22,20 +22,26 @@
       <label class="filter-favorite"><input type="checkbox" [(ngModel)]="favoritas"
           (ngModelChange)="filtrar()"><span>Somente favoritas</span></label>
     </div>
-    <div class="catalog-count">
+    <div class="alert error" *ngIf="erro" role="alert">{{ erro }} <button type="button" (click)="plantas.recarregar()">Tentar novamente</button></div>
+    <div class="catalog-count" *ngIf="!carregando">
       <div>
         <h2>Explore as plantas</h2><span>{{ plantasFiltradas.length }} {{ plantasFiltradas.length === 1 ? 'espécie
           encontrada' : 'espécies encontradas' }}</span>
       </div><button class="link-button" (click)="limpar()" type="button">Limpar filtros</button>
     </div>
-    <div class="plant-grid" *ngIf="plantasFiltradas.length > 0; else semResultados"><app-planta-card
-        *ngFor="let planta of plantasFiltradas" [planta]="planta"></app-planta-card></div>
-    <ng-template #semResultados>
-      <div class="empty-state"><img src="assets/planta-suculenta.svg" alt="" />
-        <h3>Nenhuma planta encontrada</h3>
-        <p>Tente outro nome, escolha uma categoria diferente ou limpe os filtros.</p><button type="button"
-          class="btn btn-primary" (click)="limpar()">Limpar filtros</button>
-      </div>
-    </ng-template>
+    <div class="empty-state" *ngIf="carregando">
+      <h3>Carregando catálogo...</h3>
+    </div>
+    <ng-container *ngIf="!carregando">
+      <div class="plant-grid" *ngIf="plantasFiltradas.length > 0; else semResultados"><app-planta-card
+          *ngFor="let planta of plantasFiltradas" [planta]="planta"></app-planta-card></div>
+      <ng-template #semResultados>
+        <div class="empty-state"><img src="assets/planta-suculenta.svg" alt="" />
+          <h3>Nenhuma planta encontrada</h3>
+          <p>Tente outro nome, escolha uma categoria diferente ou limpe os filtros.</p><button type="button"
+            class="btn btn-primary" (click)="limpar()">Limpar filtros</button>
+        </div>
+      </ng-template>
+    </ng-container>
   </div>
 </section>

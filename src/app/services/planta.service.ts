@@ -1,19 +1,45 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, forkJoin, of, throwError } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { CATEGORIAS, CategoriaPlanta, Planta, PlantaDraft } from '../models/planta.model';
 import { PLANTAS_MOCK } from '../data/plantas.mock';
+import { API_BASE_URL } from '../core/api-config';
+import { mensagemErroHttp } from '../core/erro-http.util';
 
-const CHAVE_PLANTAS = 'florscan_plantas_v1';
+const URL_PLANTAS = `${API_BASE_URL}/plantas`;
 const CHAVE_FAVORITOS = 'florscan_favoritos_v1';
 
 @Injectable({ providedIn: 'root' })
 export class PlantaService {
-  private readonly plantasSubject = new BehaviorSubject<Planta[]>(this.carregar());
+  private readonly plantasSubject = new BehaviorSubject<Planta[]>([]);
   readonly plantas$ = this.plantasSubject.asObservable();
+  private readonly carregandoSubject = new BehaviorSubject<boolean>(true);
+  readonly carregando$ = this.carregandoSubject.asObservable();
+  private readonly erroSubject = new BehaviorSubject<string | null>(null);
+  readonly erro$ = this.erroSubject.asObservable();
   private readonly favoritos = new Set<number>(this.carregarFavoritos());
   private readonly favoritosSubject = new BehaviorSubject<number[]>([...this.favoritos]);
   readonly favoritos$ = this.favoritosSubject.asObservable();
   readonly categorias = CATEGORIAS;
+
+  constructor(private readonly http: HttpClient) {
+    this.recarregar();
+  }
+
+  recarregar(): void {
+    this.carregandoSubject.next(true);
+    this.erroSubject.next(null);
+    this.http.get<Planta[]>(URL_PLANTAS).pipe(
+      catchError((erro: HttpErrorResponse) => {
+        this.erroSubject.next(mensagemErroHttp(erro, 'carregar o catálogo de plantas'));
+        return of<Planta[]>([]);
+      })
+    ).subscribe(plantas => {
+      this.plantasSubject.next(plantas);
+      this.carregandoSubject.next(false);
+    });
+  }
 
   listar(): Planta[] {
     return [...this.plantasSubject.value];
@@ -37,27 +63,33 @@ export class PlantaService {
     return this.listar().filter(planta => planta.destaque).slice(0, limite);
   }
 
-  cadastrar(dados: PlantaDraft): Planta {
-    const proximoId = Math.max(0, ...this.plantasSubject.value.map(planta => planta.id)) + 1;
-    const planta: Planta = { ...dados, tags: [...dados.tags], id: proximoId, criadoEm: new Date().toISOString().slice(0, 10) };
-    this.persistir([...this.plantasSubject.value, planta]);
-    return planta;
+  cadastrar(dados: PlantaDraft): Observable<Planta> {
+    const corpo = { ...dados, tags: [...dados.tags], criadoEm: new Date().toISOString().slice(0, 10) };
+    return this.http.post<Planta>(URL_PLANTAS, corpo).pipe(
+      tap(planta => this.plantasSubject.next([...this.plantasSubject.value, planta])),
+      catchError((erro: HttpErrorResponse) => throwError(() => new Error(mensagemErroHttp(erro, 'cadastrar a planta'))))
+    );
   }
 
-  editar(id: number, dados: PlantaDraft): boolean {
-    if (!this.obterPorId(id)) return false;
-    this.persistir(this.plantasSubject.value.map(planta => planta.id === id
-      ? { ...planta, ...dados, tags: [...dados.tags] }
-      : planta));
-    return true;
+  editar(id: number, dados: PlantaDraft): Observable<Planta> {
+    const existente = this.obterPorId(id);
+    if (!existente) return throwError(() => new Error('Não foi possível editar a planta: registro não encontrado.'));
+    const corpo: Planta = { ...existente, ...dados, tags: [...dados.tags] };
+    return this.http.put<Planta>(`${URL_PLANTAS}/${id}`, corpo).pipe(
+      tap(atualizada => this.plantasSubject.next(this.plantasSubject.value.map(planta => planta.id === id ? atualizada : planta))),
+      catchError((erro: HttpErrorResponse) => throwError(() => new Error(mensagemErroHttp(erro, 'editar a planta'))))
+    );
   }
 
-  excluir(id: number): boolean {
-    if (!this.obterPorId(id)) return false;
-    this.persistir(this.plantasSubject.value.filter(planta => planta.id !== id));
-    this.favoritos.delete(id);
-    this.salvarFavoritos();
-    return true;
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(`${URL_PLANTAS}/${id}`).pipe(
+      tap(() => {
+        this.plantasSubject.next(this.plantasSubject.value.filter(planta => planta.id !== id));
+        this.favoritos.delete(id);
+        this.salvarFavoritos();
+      }),
+      catchError((erro: HttpErrorResponse) => throwError(() => new Error(mensagemErroHttp(erro, 'excluir a planta'))))
+    );
   }
 
   ehFavorita(id: number): boolean {
@@ -80,26 +112,18 @@ export class PlantaService {
     return this.listar().filter(planta => planta.categoria === categoria).length;
   }
 
-  restaurarExemplos(): void {
-    this.persistir(PLANTAS_MOCK.map(planta => ({ ...planta, tags: [...planta.tags] })));
-    this.favoritos.clear();
-    this.salvarFavoritos();
-  }
-
-  private persistir(plantas: Planta[]): void {
-    this.plantasSubject.next(plantas);
-    this.gravar('localStorage', CHAVE_PLANTAS, JSON.stringify(plantas));
-  }
-
-  private carregar(): Planta[] {
-    try {
-      const salvo = typeof localStorage !== 'undefined' ? localStorage.getItem(CHAVE_PLANTAS) : null;
-      if (salvo !== null) {
-        const lista: unknown = JSON.parse(salvo);
-        if (Array.isArray(lista)) return lista as Planta[];
-      }
-    } catch { /* Dados de demonstração continuam disponíveis */ }
-    return PLANTAS_MOCK.map(planta => ({ ...planta, tags: [...planta.tags] }));
+  restaurarExemplos(): Observable<Planta[]> {
+    const exclusoes = this.plantasSubject.value.map(planta => this.http.delete(`${URL_PLANTAS}/${planta.id}`));
+    const excluirTudo$ = exclusoes.length ? forkJoin(exclusoes) : of([]);
+    return excluirTudo$.pipe(
+      switchMap(() => forkJoin(PLANTAS_MOCK.map(planta => this.http.post<Planta>(URL_PLANTAS, { ...planta, tags: [...planta.tags] })))),
+      tap(plantas => {
+        this.plantasSubject.next(plantas);
+        this.favoritos.clear();
+        this.salvarFavoritos();
+      }),
+      catchError((erro: HttpErrorResponse) => throwError(() => new Error(mensagemErroHttp(erro, 'restaurar os exemplos'))))
+    );
   }
 
   private carregarFavoritos(): number[] {
@@ -113,12 +137,8 @@ export class PlantaService {
 
   private salvarFavoritos(): void {
     this.favoritosSubject.next([...this.favoritos]);
-    this.gravar('sessionStorage', CHAVE_FAVORITOS, JSON.stringify([...this.favoritos]));
-  }
-
-  private gravar(tipo: 'sessionStorage' | 'localStorage', chave: string, valor: string): void {
     try {
-      if (typeof window !== 'undefined') window[tipo].setItem(chave, valor);
-    } catch { /* Modo sem armazenamento: dados persistem apenas enquanto a página estiver aberta */ }
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(CHAVE_FAVORITOS, JSON.stringify([...this.favoritos]));
+    } catch { /* Modo sem armazenamento: favoritos persistem apenas em memória */ }
   }
 }

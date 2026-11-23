@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { Usuario, UsuarioRegistro } from '../models/usuario.model';
+import { API_BASE_URL } from '../core/api-config';
+import { mensagemErroHttp } from '../core/erro-http.util';
 
-const CHAVE_USUARIOS = 'florscan_usuarios_v1';
+const URL_USUARIOS = `${API_BASE_URL}/usuarios`;
 const CHAVE_SESSAO = 'florscan_sessao_v1';
-const ADMIN_DEMO: UsuarioRegistro = {
-  id: 1, nome: 'Admin FlorScan', email: 'admin@florscan.com', senha: 'FlorScan123', perfil: 'admin'
-};
+
+export interface ResultadoCadastro { sucesso: boolean; mensagem: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private usuarios: UsuarioRegistro[] = this.carregarUsuarios();
   private readonly atualSubject = new BehaviorSubject<Usuario | null>(this.carregarSessao());
   readonly usuario$ = this.atualSubject.asObservable();
 
@@ -18,29 +20,41 @@ export class AuthService {
   get estaAutenticado(): boolean { return this.usuarioAtual !== null; }
   get ehAdmin(): boolean { return this.usuarioAtual?.perfil === 'admin'; }
 
-  login(email: string, senha: string): boolean {
-    const usuario = this.usuarios.find(pessoa => pessoa.email.toLowerCase() === email.trim().toLowerCase() && pessoa.senha === senha);
-    if (!usuario) return false;
-    this.definirSessao(this.semSenha(usuario));
-    return true;
+  constructor(private readonly http: HttpClient) {}
+
+  /** Retorna true em caso de sucesso, false para credenciais inválidas. Erros de rede são propagados ao observable. */
+  login(email: string, senha: string): Observable<boolean> {
+    const emailNormalizado = email.trim().toLowerCase();
+    return this.http.get<UsuarioRegistro[]>(`${URL_USUARIOS}?email=${encodeURIComponent(emailNormalizado)}`).pipe(
+      map(usuarios => {
+        const usuario = usuarios.find(pessoa => pessoa.senha === senha);
+        if (!usuario) return false;
+        this.definirSessao(this.semSenha(usuario));
+        return true;
+      }),
+      catchError((erro: HttpErrorResponse) => throwError(() => new Error(mensagemErroHttp(erro, 'entrar na conta'))))
+    );
   }
 
-  cadastrar(nome: string, email: string, senha: string): { sucesso: boolean; mensagem: string } {
+  cadastrar(nome: string, email: string, senha: string): Observable<ResultadoCadastro> {
+    const nomeNormalizado = nome.trim();
     const emailNormalizado = email.trim().toLowerCase();
-    if (this.usuarios.some(usuario => usuario.email.toLowerCase() === emailNormalizado)) {
-      return { sucesso: false, mensagem: 'Este e-mail já está cadastrado.' };
+    if (nomeNormalizado.length < 2 || senha.length < 6 || !/^\S+@\S+\.\S+$/.test(emailNormalizado)) {
+      return of({ sucesso: false, mensagem: 'Verifique nome, e-mail e senha (mínimo de 6 caracteres).' });
     }
-    if (nome.trim().length < 2 || senha.length < 6 || !/^\S+@\S+\.\S+$/.test(emailNormalizado)) {
-      return { sucesso: false, mensagem: 'Verifique nome, e-mail e senha (mínimo de 6 caracteres).' };
-    }
-    const usuario: UsuarioRegistro = {
-      id: Math.max(...this.usuarios.map(pessoa => pessoa.id), 0) + 1,
-      nome: nome.trim(), email: emailNormalizado, senha, perfil: 'visitante'
-    };
-    this.usuarios = [...this.usuarios, usuario];
-    this.gravar('localStorage', CHAVE_USUARIOS, JSON.stringify(this.usuarios));
-    this.definirSessao(this.semSenha(usuario));
-    return { sucesso: true, mensagem: 'Conta criada com sucesso.' };
+    return this.http.get<UsuarioRegistro[]>(`${URL_USUARIOS}?email=${encodeURIComponent(emailNormalizado)}`).pipe(
+      switchMap(existentes => {
+        if (existentes.length > 0) return of<ResultadoCadastro>({ sucesso: false, mensagem: 'Este e-mail já está cadastrado.' });
+        const novoUsuario: Omit<UsuarioRegistro, 'id'> = { nome: nomeNormalizado, email: emailNormalizado, senha, perfil: 'visitante' };
+        return this.http.post<UsuarioRegistro>(URL_USUARIOS, novoUsuario).pipe(
+          map(usuarioCriado => {
+            this.definirSessao(this.semSenha(usuarioCriado));
+            return { sucesso: true, mensagem: 'Conta criada com sucesso.' };
+          })
+        );
+      }),
+      catchError((erro: HttpErrorResponse) => throwError(() => new Error(mensagemErroHttp(erro, 'criar a conta'))))
+    );
   }
 
   sair(): void {
@@ -49,26 +63,15 @@ export class AuthService {
 
   private definirSessao(usuario: Usuario | null): void {
     this.atualSubject.next(usuario);
-    if (usuario) this.gravar('sessionStorage', CHAVE_SESSAO, JSON.stringify(usuario));
-    else {
-      try { if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem(CHAVE_SESSAO); } catch { /* no-op */ }
-    }
+    try {
+      if (typeof sessionStorage === 'undefined') return;
+      if (usuario) sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify(usuario));
+      else sessionStorage.removeItem(CHAVE_SESSAO);
+    } catch { /* sessão persiste apenas em memória */ }
   }
 
   private semSenha(usuario: UsuarioRegistro): Usuario {
     return { id: usuario.id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil };
-  }
-
-  private carregarUsuarios(): UsuarioRegistro[] {
-    try {
-      const salvo = typeof localStorage !== 'undefined' ? localStorage.getItem(CHAVE_USUARIOS) : null;
-      const dados: unknown = salvo ? JSON.parse(salvo) : [];
-      if (Array.isArray(dados)) {
-        const clientes = (dados as UsuarioRegistro[]).filter(usuario => usuario.email !== ADMIN_DEMO.email);
-        return [ADMIN_DEMO, ...clientes];
-      }
-    } catch { /* mantém conta de demonstração */ }
-    return [ADMIN_DEMO];
   }
 
   private carregarSessao(): Usuario | null {
@@ -76,9 +79,5 @@ export class AuthService {
       const salvo = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(CHAVE_SESSAO) : null;
       return salvo ? JSON.parse(salvo) as Usuario : null;
     } catch { return null; }
-  }
-
-  private gravar(tipo: 'sessionStorage' | 'localStorage', chave: string, valor: string): void {
-    try { if (typeof window !== 'undefined') window[tipo].setItem(chave, valor); } catch { /* sem persistência */ }
   }
 }

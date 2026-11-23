@@ -1,4 +1,11 @@
-<ng-container *ngIf="planta as item; else plantaAusente">
+<div class="container empty-state page-empty" *ngIf="carregando">
+  <h1>Carregando planta...</h1>
+</div>
+<div class="container empty-state page-empty" *ngIf="!carregando && erro">
+  <h1>Não foi possível carregar esta planta.</h1>
+  <p>{{ erro }}</p><button type="button" class="btn btn-primary" (click)="plantas.recarregar()">Tentar novamente</button>
+</div>
+<ng-container *ngIf="!carregando && !erro"><ng-container *ngIf="planta as item; else plantaAusente">
   <div class="container breadcrumbs"><a routerLink="/">Início</a><span>›</span><a
       routerLink="/catalogo">Catálogo</a><span>›</span><strong>{{ item.nome }}</strong></div>
   <section class="section detail-section">
@@ -50,3 +57,4 @@
       catálogo</a>
   </section>
 </ng-template>
+</ng-container>

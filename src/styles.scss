@@ -301,6 +301,7 @@ input[type=checkbox] { accent-color:var(--olive); width:17px; height:17px; }
 .empty-table { padding:20px; text-align:center; color:#8b958a; }
 .alert { display:flex; justify-content:space-between; gap:15px; padding:14px 18px; border-radius:10px; margin-bottom:17px; font-size:.87rem; font-weight:800; }
 .alert.success { background:#e8f4e5; color:#407244; }
+.alert.error { background:#fbe9ec; color:#aa394c; }
 .alert button { border:0; background:transparent; font-size:20px; color:inherit; }
 .admin-form-panel { border:2px solid #cdd7bf; }
 .admin-form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:19px; margin:20px 0; }

@@ -2,22 +2,22 @@
 
 **Explore a natureza, descubra espécies e cultive conhecimento.**
 
-O FlorScan é uma aplicação Angular para explorar espécies de plantas, identificá-las por foto e cuidar melhor delas. Reúne um catálogo pesquisável, identificação real de plantas por imagem (API do [Pl@ntNet](https://plantnet.org/)), sistema de favoritos, autenticação e uma área administrativa com dashboard — tudo com persistência real em uma Web API própria.
+O FlorScan é uma aplicação web desenvolvida em Angular para explorar espécies de plantas e aprender sobre seus cuidados. A plataforma reúne um catálogo pesquisável, identificação demonstrativa por imagem, sistema de favoritos, autenticação e uma área administrativa com dashboard. Os dados de plantas e usuários são persistidos em uma Web API REST local.
 
-Projeto acadêmico de Desenvolvimento Web Front-End (Ciência da Computação, Universidade FUMEC), desenvolvido por **Ana Luiza de Lacerda** e **Gabriel Batista Silva**.
+Projeto acadêmico da disciplina de Desenvolvimento Web Front-End, do curso de Ciência da Computação da Universidade FUMEC, desenvolvido por **Ana Luiza de Lacerda** e **Gabriel Batista Silva**.
 
 ---
 
 ## Identidade visual
 
-Verde-oliva, rosa e tons suaves, com a fonte Nunito e bordas arredondadas — uma cara leve e acolhedora, de jardim digital.
+A identidade visual utiliza verde-oliva, rosa e tons suaves, com a fonte Nunito e bordas arredondadas.
 
 | Cor | Hex | Uso |
 |---|---|---|
 | Verde oliva | `#707318` | Principal / destaques |
 | Verde claro | `#ABA415` | Secundária |
-| Rosa vibrante | `#FB8BA3` | Interativos |
-| Rosa suave | `#FFB1C2` | Decorativa |
+| Rosa vibrante | `#FB8BA3` | Elementos interativos |
+| Rosa suave | `#FFB1C2` | Elementos decorativos |
 | Pêssego | `#FFD4C9` | Fundos |
 | Branco lavanda | `#F9F8FE` | Superfícies |
 
@@ -25,75 +25,279 @@ Verde-oliva, rosa e tons suaves, com a fonte Nunito e bordas arredondadas — um
 
 ## O que o FlorScan faz
 
-- 🔍 **Catálogo** — busca, filtros por categoria e favoritos, páginas de detalhes com cuidados.
-- 📷 **Identificação por imagem** — envie uma foto e o Pl@ntNet analisa de verdade (não é simulação): nome científico, nomes populares, família botânica, confiança, e link direto para a planta no catálogo, se ela já existir.
-- 🔐 **Contas** — login e cadastro com formulários reativos e validação em tempo real; visitante x administrador.
-- 🛠️ **Administração** — CRUD completo de espécies, com dashboard de indicadores.
-- 🌐 **Dados reais** — tudo persistido em uma Web API própria (não há mais arrays simulados ou `localStorage` fazendo esse papel).
+- **Catálogo de plantas:** pesquisa, filtros por categoria, favoritos e páginas de detalhes com informações sobre cuidados.
+- **Identificação demonstrativa por imagem:** permite enviar uma imagem e apresenta uma sugestão acadêmica baseada no nome do arquivo. A aplicação não analisa os pixels nem realiza reconhecimento visual real.
+- **Contas de usuário:** cadastro e login com formulários reativos e validações.
+- **Perfis de acesso:** diferencia visitantes e administradores.
+- **Administração:** cadastro, consulta, edição e exclusão de espécies.
+- **Dashboard:** apresenta indicadores e distribuição das plantas por categoria.
+- **Persistência:** plantas e usuários são consultados e gravados na Web API local.
 
-> Os resultados da identificação são sugestões automáticas do Pl@ntNet — uma confiança alta não é garantia, e cabe revisão humana.
+> **Limitação da identificação:** a identificação por imagem é uma simulação acadêmica. A integração com a API Pl@ntNet e o reconhecimento real de imagens não fazem parte desta entrega.
+
+### Autenticação
+
+- Formulários reativos de login e cadastro, com validadores do Angular.
+- Mensagens de erro específicas por campo.
+- Cadastro de usuários com perfil de visitante.
+- Sessão do usuário armazenada em `sessionStorage`.
+- Diferenciação entre visitantes e administradores.
+- Proteção das rotas administrativas.
+
+### Administração
+
+- Cadastro, edição e exclusão de espécies.
+- Consulta dos registros existentes.
+- Busca local sobre os dados recebidos da API.
+- Restauração dos dados de exemplo por meio de requisições à API.
+- Dashboard com indicadores e distribuição por categoria.
+
+### Web API e comunicação HTTP
+
+- API REST local servida com `json-server`.
+- Comunicação por meio do `HttpClient` do Angular.
+- Utilização dos métodos GET, POST, PUT e DELETE.
+- Tratamento de erros de comunicação, como quando a API está indisponível.
+- Estados de carregamento durante as requisições.
+- Persistência dos dados no arquivo `db.json`.
 
 ---
 
-## Telas
+## Telas da aplicação
 
-| Tela | Rota |
+O FlorScan possui sete telas principais, além de uma página para rotas não encontradas.
+
+| Tela | Rota | Descrição |
+|---|---|---|
+| Início | `/` | Apresentação da plataforma, destaques, categorias e identificação demonstrativa |
+| Catálogo | `/catalogo` | Exploração, pesquisa e filtragem de plantas |
+| Detalhes | `/plantas/:id` | Características, cuidados e favoritos |
+| Login | `/login` | Acesso à aplicação |
+| Cadastro | `/cadastro` | Registro de novos usuários |
+| Administração | `/administracao` | Gerenciamento das espécies |
+| Dashboard | `/dashboard` | Indicadores e visão geral do catálogo |
+| Página 404 | `/**` | Tratamento de rotas inexistentes |
+
+---
+
+## Tecnologias utilizadas
+
+| Tecnologia | Utilização |
 |---|---|
-| Início (destaques + identificação) | `/` |
-| Catálogo | `/catalogo` |
-| Detalhes da espécie | `/plantas/:id` |
-| Login / Cadastro | `/login`, `/cadastro` |
-| Administração *(admin)* | `/administracao` |
-| Dashboard *(admin)* | `/dashboard` |
+| Angular 20 | Framework principal |
+| TypeScript | Lógica e tipagem da aplicação |
+| HTML5 | Estrutura das interfaces |
+| SCSS / CSS3 | Estilização e responsividade |
+| Angular Router | Navegação entre páginas |
+| Angular HttpClient | Comunicação com a Web API |
+| Angular Reactive Forms | Formulários e validações |
+| json-server | Web API REST local |
+| RxJS | Programação reativa |
+| SessionStorage | Armazenamento da sessão e dos favoritos |
+| Karma e Jasmine | Testes unitários |
+| Git e GitHub | Versionamento do projeto |
+
+### Conceitos Angular aplicados
+
+- **Componentização:** separação de elementos reutilizáveis, como cabeçalho, rodapé e cards de plantas.
+- **Roteamento:** navegação com Angular Router, `routerLink` e rotas dinâmicas.
+- **Data Binding:** interpolação, property binding, event binding e two-way binding.
+- **Diretivas:** utilização de `*ngIf`, `*ngFor`, `ngModel` e classes condicionais.
+- **Formulários reativos:** utilização de `FormGroup`, `FormBuilder`, `Validators` e validação customizada para confirmação de senha.
+- **HttpClient:** comunicação com a Web API, incluindo tratamento de erros e estados de carregamento.
+- **Services:** centralização das operações relacionadas a plantas, autenticação e identificação demonstrativa.
+- **Guards:** controle de acesso às páginas administrativas.
+- **CRUD:** criação, leitura, atualização e exclusão de espécies, com persistência na API.
 
 ---
 
-## Tecnologias
+## Como executar o projeto
 
-Angular 20 · TypeScript · Reactive Forms · HttpClient · RxJS · json-server (Web API) · Node.js/Express/Multer (proxy do Pl@ntNet) · SCSS · Karma/Jasmine.
+### Requisitos
 
----
+- Node.js 22.12 ou superior.
+- npm.
 
-## Como rodar
+### 1. Baixe o projeto
 
-Precisa de Node 22.12+ e npm. Três terminais, nesta ordem:
+```bash
+git clone https://github.com/delacerdaq/flor-scan.git
+cd flor-scan
+```
+
+Se você já possui o projeto em sua máquina, entre na pasta dele.
+
+### 2. Instale as dependências
 
 ```bash
 npm install
-cp .env.example .env     # preencha PLANTNET_API_KEY (grátis em my.plantnet.org/signup)
-
-npm run api               # terminal 1 — Web API do catálogo (porta 3000)
-npm run api:identificacao # terminal 2 — proxy do Pl@ntNet (porta 3333)
-npm start                  # terminal 3 — Angular, abre em localhost:4200
 ```
 
-Sem a chave do Pl@ntNet, tudo funciona normalmente — só a identificação por foto fica indisponível (com aviso claro na tela).
+### 3. Inicie a Web API
 
-**Login de demonstração:** `admin@florscan.com` / `FlorScan123` (acesso a `/administracao` e `/dashboard`).
+Em um terminal, execute:
 
-| Comando | O que faz |
+```bash
+npm run api
+```
+
+A API ficará disponível em `http://localhost:3000`, com os recursos `/plantas` e `/usuarios`.
+
+**Mantenha esse terminal aberto** enquanto utilizar a aplicação.
+
+### 4. Inicie o Angular
+
+Abra outro terminal, na pasta do projeto, e execute:
+
+```bash
+npm start
+```
+
+### 5. Acesse a aplicação
+
+Abra o navegador em:
+
+`http://localhost:4200/`
+
+> Se a Web API não estiver em execução, as telas que dependem dos dados de plantas poderão apresentar mensagens de erro de conexão.
+
+### Comandos disponíveis
+
+| Comando | Descrição |
 |---|---|
-| `npm run api` / `npm run api:identificacao` | Sobe as duas APIs locais |
-| `npm start` | Servidor Angular |
-| `npm run build` | Build de produção |
-| `npm run test:ci` | Roda os 35 testes unitários |
+| `npm run api` | Inicia a Web API local na porta 3000 |
+| `npm start` | Inicia o servidor de desenvolvimento Angular |
+| `npm run build` | Compila o projeto |
+| `npm run test` | Executa os testes em modo interativo |
+| `npm run test:ci` | Executa os testes uma única vez, sem watch |
+| `npx ng build --configuration production` | Gera a versão de produção |
+| `npx tsc --noEmit` | Verifica os tipos TypeScript |
+
+**Validação registrada:** em 23/11/2026, o build de produção, a verificação de tipos e os 21 testes unitários foram executados com sucesso, com a Web API em funcionamento.
+
+---
+
+## Acesso demonstrativo
+
+Para testar as funcionalidades administrativas, utilize:
+
+| Campo | Credencial |
+|---|---|
+| E-mail | `admin@florscan.com` |
+| Senha | `FlorScan123` |
+| Perfil | Administrador |
+
+Após o login, estarão disponíveis as rotas:
+
+- `/dashboard`
+- `/administracao`
+
+Os usuários cadastrados pela interface recebem o perfil de **visitante** e não possuem acesso às funcionalidades administrativas.
+
+> **Aviso de segurança:** a autenticação é demonstrativa. Os usuários são persistidos na Web API local, mas as senhas ficam armazenadas em texto puro, sem hashing, tokens de sessão ou HTTPS. Não utilize senhas reais. Esta implementação não é adequada para produção.
+
+---
+
+## Estrutura do projeto
+
+```text
+flor-scan/
+│
+├── db.json                      # Banco de dados da Web API (json-server)
+├── public/
+│   └── assets/                  # Ilustrações e recursos visuais
+│
+├── src/
+│   └── app/
+│       ├── core/                # Configuração da API e utilitários HTTP
+│       ├── components/          # Componentes reutilizáveis
+│       │   ├── header/
+│       │   ├── footer/
+│       │   └── planta-card/
+│       ├── pages/               # Páginas da aplicação
+│       ├── models/              # Interfaces e modelos de dados
+│       ├── data/                # Dados de exemplo para restauração
+│       ├── services/            # Serviços da aplicação
+│       │   ├── planta.service.ts
+│       │   ├── auth.service.ts
+│       │   └── identificacao.service.ts
+│       ├── guards/              # Proteção de rotas
+│       │   └── admin.guard.ts
+│       ├── app.module.ts
+│       └── app-routing.module.ts
+│
+├── scripts/                     # Scripts auxiliares
+├── package.json
+└── README.md
+```
+
+---
+
+## Serviços principais
+
+- **PlantaService:** responsável pela consulta, busca, cadastro, edição, exclusão e gerenciamento de favoritos. As operações de CRUD utilizam `HttpClient` para acessar o recurso `/plantas` da Web API. Os favoritos são armazenados em `sessionStorage`.
+- **AuthService:** responsável pelo cadastro, login, logout e gerenciamento da sessão dos usuários. O cadastro e a consulta utilizam `HttpClient` para acessar o recurso `/usuarios`; a sessão atual fica em `sessionStorage`.
+- **IdentificacaoService:** responsável pela sugestão demonstrativa de espécies. Não realiza análise real da imagem.
+- **AdminGuard:** restringe o acesso às rotas administrativas a usuários com perfil de administrador.
+
+---
+
+## Testando as funcionalidades
+
+Com a Web API em execução (`npm run api`), siga este roteiro:
+
+1. Acesse o catálogo e pesquise por `rosa`.
+2. Utilize o filtro de categoria **Flores**.
+3. Abra os detalhes de uma espécie e adicione-a aos favoritos.
+4. Ative o filtro **Somente favoritas** para visualizar os itens selecionados.
+5. Na página inicial, envie uma imagem JPG ou PNG e observe a sugestão demonstrativa.
+6. Entre com as credenciais de administrador.
+7. Acesse a administração e cadastre, edite e exclua uma planta.
+8. Confira as alterações no catálogo e no dashboard.
+9. Utilize **Restaurar exemplos** para recuperar os dados iniciais.
+10. Cadastre um visitante e verifique as restrições de acesso.
+11. Redimensione a janela para testar a responsividade e o menu móvel.
+12. Atualize a página e observe a persistência dos dados.
+
+### Persistência de dados
+
+| Recurso | Armazenamento |
+|---|---|
+| Catálogo de plantas | Web API (`json-server` → `db.json`), via `HttpClient` |
+| Usuários cadastrados | Web API (`json-server` → `db.json`), via `HttpClient` |
+| Sessão do usuário atual | `sessionStorage` |
+| Favoritos | `sessionStorage` |
+
+As plantas e os usuários são lidos e gravados na Web API. Atualizar a página ou reiniciar o navegador não apaga esses registros, desde que a API continue utilizando o mesmo arquivo `db.json`. A sessão e os favoritos, por outro lado, ficam no armazenamento da sessão do navegador.
 
 ---
 
 ## Avisos importantes
 
-- **Autenticação demonstrativa:** usuários ficam na Web API local, mas sem hashing de senha, tokens ou HTTPS — não é um sistema seguro de produção.
-- **Privacidade da foto:** enviada só ao Pl@ntNet para identificar a espécie; não é salva em disco nem na Web API.
-- **Favoritos** vivem em `sessionStorage` (preferência da sessão do visitante, não um dado da API).
+- **Identificação por imagem:** é uma simulação acadêmica baseada no nome do arquivo enviado; não há reconhecimento visual real nem integração com o Pl@ntNet nesta entrega.
+- **Autenticação demonstrativa:** não utiliza hashing de senhas, tokens ou HTTPS. Não deve ser utilizada em produção.
+- **Favoritos:** ficam em `sessionStorage` e não são persistidos na Web API.
+- **Caráter do projeto:** a aplicação tem finalidade educacional e demonstrativa.
 
 ---
 
-## Quer entender a fundo?
+## Documentação complementar
 
-Este README é o resumo. O desenvolvimento completo — arquitetura, decisões, bugs encontrados e como foram corrigidos, testes — está documentado em:
+O desenvolvimento e as decisões do projeto também estão registrados nos documentos:
 
-- [`docs/relatorio-desenvolvimento-completo.md`](docs/relatorio-desenvolvimento-completo.md) — relatório técnico completo.
-- [`docs/relatorio-academico.md`](docs/relatorio-academico.md) — relatório para a entrega acadêmica.
+- [`docs/relatorio-desenvolvimento-completo.md`](docs/relatorio-desenvolvimento-completo.md) — relatório técnico do desenvolvimento.
+- [`docs/relatorio-academico.md`](docs/relatorio-academico.md) — relatório da entrega acadêmica.
+
+---
+
+## Melhorias futuras
+
+- Implementar identificação real de plantas por imagem, utilizando um serviço de reconhecimento como o Pl@ntNet.
+- Substituir o `json-server` por uma API própria integrada a um banco de dados.
+- Implementar autenticação segura, com hashing de senhas, tokens e gerenciamento de sessões no servidor.
+- Adicionar upload e armazenamento remoto de imagens.
+- Ampliar o catálogo de espécies.
+- Desenvolver recomendações personalizadas de cuidados.
 
 ---
 

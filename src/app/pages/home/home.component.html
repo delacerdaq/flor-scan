@@ -89,7 +89,9 @@
       <h2>Plantas que merecem <em>destaque.</em></h2>
       <p>Conheça algumas das nossas espécies favoritas e descubra os cuidados de cada uma.</p>
     </div>
-    <div class="plant-grid"><app-planta-card *ngFor="let planta of destaques" [planta]="planta"></app-planta-card></div>
+    <div class="alert error" *ngIf="erroDestaques" role="alert">{{ erroDestaques }} <button type="button" (click)="plantas.recarregar()">Tentar novamente</button></div>
+    <p *ngIf="carregandoDestaques">Carregando destaques...</p>
+    <div class="plant-grid" *ngIf="!carregandoDestaques"><app-planta-card *ngFor="let planta of destaques" [planta]="planta"></app-planta-card></div>
     <div class="section-action"><a class="btn btn-outline" routerLink="/catalogo">Ver catálogo completo <span
           aria-hidden="true">→</span></a></div>
   </div>

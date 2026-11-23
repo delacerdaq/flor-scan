@@ -1,20 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Planta } from '../../models/planta.model';
 import { PlantaService } from '../../services/planta.service';
 import { IdentificacaoService } from '../../services/identificacao.service';
 
 @Component({ selector: 'app-home', standalone: false, templateUrl: './home.component.html' })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   busca = '';
   previaImagem: string | null = null;
   arquivoNome = '';
   sugestao: Planta | undefined;
   erroArquivo = '';
-  readonly destaques: Planta[];
+  destaques: Planta[] = [];
+  carregandoDestaques = true;
+  erroDestaques = '';
 
-  constructor(private readonly router: Router, public readonly plantas: PlantaService, private readonly identificacao: IdentificacaoService) {
-    this.destaques = this.plantas.destaques();
+  constructor(private readonly router: Router, public readonly plantas: PlantaService, private readonly identificacao: IdentificacaoService) {}
+
+  ngOnInit(): void {
+    this.plantas.plantas$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.destaques = this.plantas.destaques());
+    this.plantas.carregando$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(carregando => this.carregandoDestaques = carregando);
+    this.plantas.erro$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(erro => this.erroDestaques = erro ?? '');
   }
 
   pesquisar(): void {
